@@ -20,7 +20,7 @@ You will need to follow the instructions for intalling the engine API at the sys
 
 For example, from an Anaconda prompt, run the following commands: 
 
-`conda activate sensitivity_analysis`
+`conda activate scene_labeling`
 
 `cd <matlabroot>\extern\engines\python`
 
