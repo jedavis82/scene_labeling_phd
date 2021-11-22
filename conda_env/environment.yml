@@ -1,4 +1,4 @@
-name: sensitivity_analysis
+name: scene_labeling
 channels:
   - defaults
 dependencies:
