@@ -77,8 +77,8 @@ with the **General** domain level two summaries and **Person** domain level two 
 | Object Localization | Level Two Summaries | 
 | ------------------- | ------------------- | 
 | ![](./bench.jpg)    | **General:** Person_1 interacting with bench_1 <br /> **Person:** Person_1 sitting on bench_1 | 
-| ![](./umbrella.jpg) | General: Person_1 interacting with umbrella_1 <br /> **Person:** Person_1 carrying umbrella_1 | 
-| ![](./cell_phone.jpg)| General: Person_1 interacting with cell_phone_1 <br /> **Person:** person_1 talking on cell_phone_1 | 
+| ![](./umbrella.jpg) | **General:** Person_1 interacting with umbrella_1 <br /> **Person:** Person_1 carrying umbrella_1 | 
+| ![](./cell_phone.jpg)| **General:** Person_1 interacting with cell_phone_1 <br /> **Person:** person_1 talking on cell_phone_1 | 
 
 # Attribution
 Citation information here 
