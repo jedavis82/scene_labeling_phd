@@ -1,6 +1,7 @@
 """
-Visualize the level one summary results stored in the CSV file
+Visuzlize the person domain level two summaries stored in the output CSV file
 """
+
 import pandas as pd
 import cv2
 import json
@@ -8,10 +9,9 @@ import numpy as np
 import os
 
 INPUT_IMAGES_DIR = '../input/coco_images/'
-LEVEL_ONE_SUMMARIES_FILE = '../output/level_one_summaries.csv'
+PERSON_LEVEL_TWO_SUMMARIES_FILE = '../output/person_level_two_summaries.csv'
 
-# Store the level one summary images of interest
-OUTPUT_DIR = '../input/image_results/level_one/'
+OUTPUT_DIR = '../input/image_results/person_level_two/'
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
 
@@ -50,16 +50,21 @@ def draw_img_results(img, boxes, labels):
 
 
 def main():
-    l1_df = pd.read_csv(LEVEL_ONE_SUMMARIES_FILE, encoding='utf-8', engine='python')
-    img_paths = list(l1_df['relative_path'].unique())
+    l2_df = pd.read_csv(PERSON_LEVEL_TWO_SUMMARIES_FILE, encoding='utf-8', engine='python')
+    img_paths = list(l2_df['relative_path'].unique())
     for p in img_paths:
-        img_df = l1_df.loc[l1_df['relative_path'] == p]
+        img_df = l2_df.loc[l2_df['relative_path'] == p]
         img_path = INPUT_IMAGES_DIR + p
         orig_img = cv2.imread(img_path, cv2.IMREAD_COLOR)
         boxes = []
         labels = []
         l1_summaries = []
+        l2_summaries = []
         for idx, row in img_df.iterrows():
+            # This script only shows positive interactions
+            l2_summary = row['person_level_two_summary']
+            if 'Negative Interaction' in l2_summary:
+                continue
             arg_label = row['arg_label']
             if not arg_label in labels:
                 labels.append(arg_label)
@@ -70,17 +75,26 @@ def main():
                 boxes.append(convert_box(row['ref_bounding_box']))
             l1_summary = row['level_one_summary']
             if not l1_summary in l1_summaries:
-                l1_summaries.append(row['level_one_summary'])
+                l1_summaries.append(l1_summary)
+            if not l2_summary in l2_summaries:
+                l2_summaries.append(l2_summary)
         result_img = draw_img_results(orig_img, boxes, labels)
-        for l in l1_summaries:
-            print(l)
-        print()
-        cv2.imshow('Level One Summaries', result_img)
-        in_key = cv2.waitKey(0)
-        # If 's' is pressed, store the image to the output directory
-        if in_key == ord('s'):
-            output_path = OUTPUT_DIR + p
-            cv2.imwrite(output_path, result_img)
+        if len(l1_summaries) > 0:
+            print('Level One Summaries:')
+            for l in l1_summaries:
+                print(l)
+        if len(l2_summaries) > 0:
+            print('\nLevel Two Summaries:')
+            for l in l2_summaries:
+                print(l)
+        if len(l1_summaries) > 0 or len(l2_summaries) > 0:
+            print()
+            cv2.imshow('Level Two Summaries', result_img)
+            in_key = cv2.waitKey(0)
+            # If 's' is pressed, store the image to the output directory
+            if in_key == ord('s'):
+                output_path = OUTPUT_DIR + p
+                cv2.imwrite(output_path, result_img)
 
 
 if __name__ == '__main__':

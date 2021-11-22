@@ -8,6 +8,7 @@ import numpy as np
 
 INPUT_IMAGES_DIR = '../input/coco_images/'
 OBJECT_DETECTION_FILE = '../input/object_detection.csv'
+METADATA_FILE = '../input/metadata.csv'
 
 COLORS = [
     [255, 0, 0],
@@ -30,9 +31,13 @@ def convert_boxes(json_boxes):
 
 
 def main():
-    od_df = pd.read_csv(OBJECT_DETECTION_FILE, encoding='utf-8', engine='python', error_bad_lines=False)
+    od_df = pd.read_csv(OBJECT_DETECTION_FILE, encoding='utf-8', engine='python')
+    meta_df = pd.read_csv(METADATA_FILE, encoding='utf-8', engine='python')
     for idx, row in od_df.iterrows():
-        img_path = INPUT_IMAGES_DIR + row['relative_path']
+        rel_path = row['relative_path']
+        img_meta = meta_df.loc[meta_df['relative_path'] == rel_path]
+        img_meta = json.loads(img_meta['labels'].iloc[0])
+        img_path = INPUT_IMAGES_DIR + rel_path
         orig_img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 
         boxes = convert_boxes(row['bounding_boxes'])
@@ -48,6 +53,7 @@ def main():
                 i_color = 0
             cv2.rectangle(orig_img, (box[0], box[1]), (box[2], box[3]), color, 2)
             cv2.putText(orig_img, label, (box[0], box[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.75, color, 2)
+        print(f'Image metadata: {img_meta}')
         cv2.imshow('Img', orig_img)
         cv2.waitKey(0)
 

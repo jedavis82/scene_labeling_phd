@@ -29,7 +29,7 @@ def main():
         splits=["train", "validation"],
         classes=["person"],
         label_types="detections",
-        max_samples=1000,
+        max_samples=25,
         include_license=False
     )
 
