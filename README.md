@@ -56,8 +56,10 @@ three stages of the pipeline.
    3. The object localization and meta data results will be stored in CSV files
 2. Level One Summaries
    1. Generates information corresponding to proximity, overlap, and spatial relationships pertaining to each object two-tuple in an image
-   2. The level one summaries will be stored to CSV file after computation 
-   3. This is a computationally expensive process, and as such there is a boolean flag in `app.py`
+   2. Promity and Overlap information is computed using the Generalized Intersection Over Union (GIOU) [[4]](#4) algorithm
+   3. Spatial Relationship information is computed using the Histogram of Forces (HOF) [[1]](#1) [[2]](#2) [[3]](#3) algorithm
+   4. The level one summaries will be stored to CSV file after computation 
+   5. This is a computationally expensive process, and as such there is a boolean flag in `app.py`
       1. `FINALIZED_LEVEL_ONE` is set to false initially for level one summary computation 
          1. Level one summaries will be written to disk every 10 computations to avoid recomputing results
          2. `FINALIZED_LEVEL_ONE` should be set to true after the level one summaries have been computed
@@ -82,3 +84,16 @@ with the **General** domain level two summaries and **Person** domain level two 
 
 # Attribution
 Citation information here 
+
+# References 
+<a id="1">[1]</a>
+Matsakis, P. and Wendling, L., “New Way to Represent the Relative Position between Areal Objects,” IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 21, No. 7, 1999, pp. 634-643.
+
+<a id="2">[2]</a>
+Matsakis, P., Keller, J., Wendling, L., Marjamaa, J. and Sjahputera, O., "Linguistic Description of Relative Positions of Objects in Images", IEEE Transactions on Systems, Man, and Cybernetics, Vol. 31, No. 4, 2001, pp. 573-588.
+
+<a id="3">[3]</a>
+Matsakis, P., Keller, J., Sjahputera, O., and Marjamaa, J. “The Use of Force Histograms for Affine-Invariant Relative Position Description”, IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 26, No. 1, 2004, pp.1-18.
+
+<a id="4">[4]</a>
+Rezatofighi, H., Tsoi, N., Gwak, J., Sadeghian, A., Reid, I., and Savarese, S, "Generalized Intersection Over Union: A Metric and A Loss for Bounding Box Regression", IEEE Conference on Computer Vision and Pattern Recognition (CVPR), June 2019.
