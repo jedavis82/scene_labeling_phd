@@ -50,14 +50,14 @@ After the images are downloaded, the `app.py` script can be ran and will process
 three stages of the pipeline. 
 
 1. Object detection
-   1. Performs object localization using the YOLOv3 model 
+   1. Performs object localization using the YOLOv3 [[1]](#1) model 
    2. Performs meta data generation using the Inception model 
       1. The Inception model will be downloaded at runtime to the appropriate directory if the model does not exist
    3. The object localization and meta data results will be stored in CSV files
 2. Level One Summaries
    1. Generates information corresponding to proximity, overlap, and spatial relationships pertaining to each object two-tuple in an image
-   2. Promity and Overlap information is computed using the Generalized Intersection Over Union (GIOU) [[4]](#4) algorithm
-   3. Spatial Relationship information is computed using the Histogram of Forces (HOF) [[1]](#1) [[2]](#2) [[3]](#3) algorithm
+   2. Promity and Overlap information is computed using the Generalized Intersection Over Union (GIOU) [[5]](#5) algorithm
+   3. Spatial Relationship information is computed using the Histogram of Forces (HOF) [[2]](#2) [[3]](#3) [[4]](#4) algorithm
    4. The level one summaries will be stored to CSV file after computation 
    5. This is a computationally expensive process, and as such there is a boolean flag in `app.py`
       1. `FINALIZED_LEVEL_ONE` is set to false initially for level one summary computation 
@@ -87,13 +87,16 @@ Citation information here
 
 # References 
 <a id="1">[1]</a>
-Matsakis, P. and Wendling, L., “New Way to Represent the Relative Position between Areal Objects,” IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 21, No. 7, 1999, pp. 634-643.
+Redmon, J. and Farhadi, A., "YOLOv3: An Incremental Improvement," arXiv, 2018. 
 
 <a id="2">[2]</a>
-Matsakis, P., Keller, J., Wendling, L., Marjamaa, J. and Sjahputera, O., "Linguistic Description of Relative Positions of Objects in Images", IEEE Transactions on Systems, Man, and Cybernetics, Vol. 31, No. 4, 2001, pp. 573-588.
+Matsakis, P. and Wendling, L., “New Way to Represent the Relative Position between Areal Objects,” IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 21, No. 7, 1999, pp. 634-643.
 
 <a id="3">[3]</a>
-Matsakis, P., Keller, J., Sjahputera, O., and Marjamaa, J. “The Use of Force Histograms for Affine-Invariant Relative Position Description”, IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 26, No. 1, 2004, pp.1-18.
+Matsakis, P., Keller, J., Wendling, L., Marjamaa, J. and Sjahputera, O., "Linguistic Description of Relative Positions of Objects in Images", IEEE Transactions on Systems, Man, and Cybernetics, Vol. 31, No. 4, 2001, pp. 573-588.
 
 <a id="4">[4]</a>
+Matsakis, P., Keller, J., Sjahputera, O., and Marjamaa, J. “The Use of Force Histograms for Affine-Invariant Relative Position Description”, IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 26, No. 1, 2004, pp.1-18.
+
+<a id="5">[5]</a>
 Rezatofighi, H., Tsoi, N., Gwak, J., Sadeghian, A., Reid, I., and Savarese, S, "Generalized Intersection Over Union: A Metric and A Loss for Bounding Box Regression", IEEE Conference on Computer Vision and Pattern Recognition (CVPR), June 2019.
