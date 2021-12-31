@@ -3,10 +3,15 @@ Call the HOF code from Matlab and return the results to the Python script
 """
 
 import numpy as np
-import pandas as pd
-
+from sklearn.preprocessing import minmax_scale
 
 def compute_hof(engine=None, matlab_args=None):
+    """
+    Compute HOF for an object two-tuple and return the max angles for F0, F2, and Hybrid
+    :param engine:
+    :param matlab_args:
+    :return:
+    """
     assert engine is not None, 'Must supply Matlab engine'
     assert matlab_args is not None, 'Must supply Matlab args'
     histograms = engine.get_hof(matlab_args, nargout=1)
@@ -16,6 +21,28 @@ def compute_hof(engine=None, matlab_args=None):
     max_f2_angle = np.argmax(histograms[1])
     max_hybrid_angle = np.argmax(histograms[2])
     return [max_f0_angle, max_f2_angle, max_hybrid_angle]
+
+
+def compute_hof_display(engine=None, matlab_args=None):
+    """
+    Compute HOF for an object two-tuple and return the histograms for displaying
+    :param engine:
+    :param matlab_args:
+    :return:
+    """
+    assert engine is not None, 'Must supply Matlab engine'
+    assert matlab_args is not None, 'Must supply Matlab args'
+    histograms = engine.get_hof(matlab_args, nargout=1)
+    histograms = np.array(histograms._data).reshape(histograms.size, order='F')
+    histograms = np.nan_to_num(histograms)
+    f0_histograms = minmax_scale(histograms[0], feature_range=(0, 100))
+    f2_histograms = minmax_scale(histograms[1], feature_range=(0, 100))
+    hyb_histograms = minmax_scale(histograms[2], feature_range=(0, 100))
+    f0_histograms = f0_histograms.astype(int)
+    f2_histograms = f2_histograms.astype(int)
+    hyb_histograms = hyb_histograms.astype(int)
+
+    return f0_histograms, f2_histograms, hyb_histograms
 
 
 def compute_giou(arg_obj, ref_obj):

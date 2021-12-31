@@ -130,3 +130,5 @@ dmypy.json
 /input/models/
 .idea/
 /input/coco_images/
+input/image_results/
+visualizations/hist_vis/

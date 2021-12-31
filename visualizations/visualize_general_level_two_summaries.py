@@ -16,9 +16,8 @@ if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
 
 COLORS = [
-    [255, 0, 0],
-    [0, 255, 0],
     [0, 0, 255],
+    [255, 0, 0],
     [255, 255, 255]
 ]
 
@@ -34,7 +33,7 @@ def draw_img_results(img, boxes, labels):
     for b, l in zip(boxes, labels):
         color = COLORS[i_color]
         i_color += 1
-        if i_color > 3:
+        if i_color > len(COLORS) - 1:
             i_color = 0
         cv2.rectangle(clone, (b[0], b[1]), (b[2], b[3]), color, 2)
         if b[0] - 10 < 0:
@@ -89,7 +88,7 @@ def main():
             for l in l2_summaries:
                 print(l)
         if len(l1_summaries) > 0 or len(l2_summaries) > 0:
-            print()
+            print(f'Image: {p}')
             cv2.imshow('Level Two Summaries', result_img)
             in_key = cv2.waitKey(0)
             # If 's' is pressed, store the image to the output directory
