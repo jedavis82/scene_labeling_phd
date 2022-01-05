@@ -15,7 +15,7 @@ IMG_OUTPUT_FILE = './hist_vis/umbrella_hof.png'
 def main():
     # filepath = Path(HIST_DIR).glob('**/*')
     # hist_files = [x for x in filepath if x.is_file()]
-    
+
     # The membership function lines to plot
     left_x = [120, 180, 240]
     left_y = [0, 100, 0]
