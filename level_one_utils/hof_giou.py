@@ -5,6 +5,7 @@ Call the HOF code from Matlab and return the results to the Python script
 import numpy as np
 from sklearn.preprocessing import minmax_scale
 
+
 def compute_hof(engine=None, matlab_args=None):
     """
     Compute HOF for an object two-tuple and return the max angles for F0, F2, and Hybrid

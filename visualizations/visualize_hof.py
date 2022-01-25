@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 HIST_DIR = './hist_vis/'
-PLOTTING_FILE = './hist_vis/person_1_umbrella_1_hists.csv'
-IMG_OUTPUT_FILE = './hist_vis/umbrella_hof.png'
+PLOTTING_FILE = './hist_vis/person_1_tie_1_hists.csv'
+IMG_OUTPUT_FILE = './hist_vis/tie_hof.png'
 
 
 def main():
@@ -44,9 +44,9 @@ def main():
 
     ax.bar(np.arange(361), magnitude, color='blue')
     ax.set_xticks(np.arange(0, 361, 45))
-    plt.legend(loc='upper left')
+    plt.legend(loc='upper right')
     plt.xlabel('Degrees')
-    plt.ylabel('Magnitude')
+    plt.ylabel('Normalized Magnitude')
     plt.savefig(IMG_OUTPUT_FILE)
     plt.show()
 
