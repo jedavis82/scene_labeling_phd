@@ -1,0 +1,6 @@
+Add in the code that visualizes the FIS rule outputs.
+    It's in the PhD repo, need to add it here
+
+Convert HOF to use the Python scripts created by Dr. Anderson's group.
+    Replace all the MatLab code with Python and update the pipeline.
+        May not need to store CSV/Json files for everything anymore. 
