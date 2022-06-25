@@ -1,6 +1,19 @@
 Add in the code that visualizes the FIS rule outputs.
     It's in the PhD repo, need to add it here
 
+Figure out what to do with the Matlab code? Do I just archive it somewhere?
+Maybe create another repo for the Matlab implementation?
+    Created a separate repo for this.
+
+Now streamline all this code so it isn't just scattered everywhere.
+Figure out how to install the dependencies for the python HOF using conda.
+    May not be possible. Look it up.
+    Uses pybind.
+    Need to go back through the conda environment file and add/remove what I need/don't need.
+
+Should just only have to change the level one utils algorithm to use the python HOF. Will make the code a
+lot cleaner most likely. Basically, do the below:
+
 Convert HOF to use the Python scripts created by Dr. Anderson's group.
     Replace all the MatLab code with Python and update the pipeline.
-        May not need to store CSV/Json files for everything anymore. 
+        May not need to store CSV/Json files for everything anymore.
