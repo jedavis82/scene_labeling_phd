@@ -4,7 +4,6 @@ For the paper, generate results for hof for the input images and store in CSV fi
 import pandas as pd
 import cv2
 import numpy as np
-import matlab.engine
 import json
 import os
 from level_one_utils.hof_giou import compute_hof_display
@@ -20,10 +19,6 @@ PERSON_L2_SUMMARIES_FILE = '../output/person_level_two_summaries.csv'
 
 
 def main():
-    # Start a matlab instance
-    eng = matlab.engine.start_matlab()
-    eng.cd('../level_one_utils')
-
     person_df = pd.read_csv(PERSON_L2_SUMMARIES_FILE, encoding='utf-8', engine='python')
 
     person_df_filtered = person_df[person_df['relative_path'].isin(IMAGE_PATHS)]
@@ -40,12 +35,12 @@ def main():
         orig_img = cv2.imread(img_path, cv2.IMREAD_ANYCOLOR)
         img_width = orig_img.shape[1]
         img_height = orig_img.shape[0]
-        matlab_args = {'img_width': img_width,
-                       'img_height': img_height,
-                       'ref_bounding_box': ref_box,
-                       'arg_bounding_box': arg_box
-                       }
-        f0, f2, hyb = compute_hof_display(eng, matlab_args)
+
+        arg_hof = np.zeros((img_width, img_height), dtype='uint8')
+        ref_hof = np.zeros((img_width, img_height), dtype='uint8')
+        arg_hof[arg_box[0]:arg_box[2], arg_box[1]:arg_box[3]] = 255
+        ref_hof[ref_box[0]:ref_box[2], ref_box[1]:ref_box[3]] = 255
+        f0, f2, hyb = compute_hof_display(arg_hof, ref_hof)
 
         out_df = pd.DataFrame(columns=['degrees', 'f0_magnitude', 'f2_magnitude', 'hyb_magnitude'])
         out_df['degrees'] = np.arange(361)

@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 HIST_DIR = './hist_vis/'
-PLOTTING_FILE = './hist_vis/person_1_tie_1_hists.csv'
-IMG_OUTPUT_FILE = './hist_vis/tie_hof.png'
+PLOTTING_FILE = './hist_vis/person_1_tennis_racket_1_hists.csv'
+IMG_OUTPUT_FILE = './hist_vis/tennis_hof.png'
 
 
 def main():

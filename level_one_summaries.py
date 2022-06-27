@@ -5,12 +5,7 @@ This method uses the Generalized Intersection Over Union method to compute the p
 Return a pandas data frame containing the level one summaries for each image
     Each level one summary will have the proximity, overlap, and spatial relationship numerical values
     As well as the level one summary labels for each of the object two-tuples
-
-The Matlab engine must be installed on the end user's machine. To do this follow these instructions from your
-virtual environment:
-https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
 """
-import matlab.engine
 import pandas as pd
 import json
 from itertools import permutations
@@ -19,7 +14,7 @@ import numpy as np
 from level_one_utils.hof_giou import compute_hof, compute_giou
 from level_one_utils.defuzz_level_one import Defuzz
 import os
-
+import cv2
 
 DIRECTION_LOOKUP = {'Right': 'is to the right of',
                     'Above Right': 'is above and to the right of',
@@ -117,10 +112,10 @@ def write_to_disk(processed_images, level_one_file):
     df.to_csv(level_one_file, mode=mode, header=header, index=False, encoding='utf-8')
 
 
-def compute_level_one_summaries(od_df, animate_objects, output_file):
+def compute_level_one_summaries(od_df, animate_objects, output_file=None):
     assert od_df is not None, 'Must supply object detection results'
     assert animate_objects is not None, 'Must supply list of animate objects'
-    assert output_file is not None, 'Must supply an output file'
+    # assert output_file is not None, 'Must supply an output file'
 
     if os.path.exists(PROCESSED_IMAGES_FILE):
         with open(PROCESSED_IMAGES_FILE, 'r') as f:
@@ -128,10 +123,7 @@ def compute_level_one_summaries(od_df, animate_objects, output_file):
     else:
         processed_images = set()
 
-    eng = matlab.engine.start_matlab()
-    eng.cd('./level_one_utils/')
     defuzzer = Defuzz()
-    # od_df = od_df[:50]  # Used for testing purposes
 
     num_processed = 0
     for idx, row in tqdm(od_df.iterrows(), total=len(od_df)):
@@ -156,11 +148,23 @@ def compute_level_one_summaries(od_df, animate_objects, output_file):
             key = f'{img_name}_{arg_label}_{ref_label}'
 
             giou, iou = compute_giou(arg_box, ref_box)
-            matlab_args = {'img_width': img_width,
-                           'img_height': img_height,
-                           'ref_bounding_box': ref_box,
-                           'arg_bounding_box': arg_box}
-            f0, f2, hybrid = compute_hof(eng, matlab_args)
+            # Create two binary mask images that correspond to the arg and ref boxes for use with HOF
+            arg_hof = np.zeros((img_height, img_width), dtype='uint8')
+            ref_hof = np.zeros((img_height, img_width), dtype='uint8')
+            arg_hof[arg_box[1]:arg_box[3], arg_box[0]:arg_box[2]] = 255
+            ref_hof[ref_box[1]:ref_box[3], ref_box[0]:ref_box[2]] = 255
+
+            # TODO: Testing
+            # img_path = f'./input/paper_images/{rel_path}'
+            # orig_img = cv2.imread(img_path, cv2.IMREAD_ANYCOLOR)
+            # cv2.rectangle(orig_img, (arg_box[0], arg_box[1]), (arg_box[2], arg_box[3]), (255, 0, 0), 2)
+            # cv2.rectangle(orig_img, (ref_box[0], ref_box[1]), (ref_box[2], ref_box[3]), (0, 255, 0), 2)
+            # cv2.imshow('Original image', orig_img)
+            # cv2.imshow('Arg object', arg_hof)
+            # cv2.imshow('Ref object', ref_hof)
+            # cv2.waitKey(0)
+            f0, f2, hybrid = compute_hof(arg_hof, ref_hof)
+
             sr_angle = get_consensus_angle(f0, f2, hybrid)
             overlap_label, sr_label = defuzzer.defuzzify_results(iou, sr_angle)
             l1_summary = construct_level_one_summary(arg_label, ref_label, overlap_label, sr_label)
@@ -173,13 +177,16 @@ def compute_level_one_summaries(od_df, animate_objects, output_file):
 
             processed_images.add(rel_path)
             num_processed += 1
-            if num_processed % 10 == 0:
+            if num_processed % 10 == 0 and output_file is not None:
                 write_to_disk(processed_images, output_file)
                 processed_images.clear()
                 L1_RESULTS.clear()
 
     # Final write to disk after the loop finishes
-    write_to_disk(processed_images, output_file)
-    results = pd.read_csv(output_file, encoding='utf-8', engine='python')
+    if output_file is not None:
+        write_to_disk(processed_images, output_file)
+        results = pd.read_csv(output_file, encoding='utf-8', engine='python')
+    else:
+        results = pd.DataFrame(L1_RESULTS)
     return results
 

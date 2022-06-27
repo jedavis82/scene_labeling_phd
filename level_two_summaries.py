@@ -28,7 +28,7 @@ def convert_meta_labels(labels):
         return labels[0]
 
 
-def compute_general_summaries(df, output_file):
+def compute_general_summaries(df, output_file=None):
     general_rules = GeneralRules()
     results = []
     for idx, row in tqdm(df.iterrows(), total=len(df)):
@@ -64,11 +64,12 @@ def compute_general_summaries(df, output_file):
             'general_level_two_summary': l2_summary
         })
     results_df = pd.DataFrame(results)
-    results_df.to_csv(output_file, encoding='utf-8', header=True, index=False)
+    if output_file is not None:
+        results_df.to_csv(output_file, encoding='utf-8', header=True, index=False)
     return results_df
 
 
-def compute_person_summaries(df, ontology_df, meta_df, output_file):
+def compute_person_summaries(df, ontology_df, meta_df, output_file=None):
     person_rules = PersonRules(ontology_df=ontology_df, show_sim_result=False)
     results = []
     for idx, row in tqdm(df.iterrows(), total=len(df)):
@@ -115,5 +116,6 @@ def compute_person_summaries(df, ontology_df, meta_df, output_file):
             'person_level_two_summary': l2_summary
         })
     results_df = pd.DataFrame(results)
-    results_df.to_csv(output_file, encoding='utf-8', header=True, index=False)
+    if output_file is not None:
+        results_df.to_csv(output_file, encoding='utf-8', header=True, index=False)
     return results_df

@@ -7,7 +7,7 @@ These files are:
     general_level_two_summaries.csv, person_level_two_summaries.csv
 """
 
-from object_detection import yolo_object_detection
+from object_detection import batch_yolo_detection
 from level_one_summaries import compute_level_one_summaries
 from level_one_utils.filter_images import filter_images
 from level_two_summaries import compute_general_summaries, compute_person_summaries
@@ -46,7 +46,7 @@ def main():
     # Compute object localization results
     if not os.path.exists(OBJECT_DETECTION_FILE):
         print('Computing object localization results')
-        od_df = yolo_object_detection(IMAGES_DIR, OBJECT_DETECTION_FILE)
+        od_df = batch_yolo_detection(IMAGES_DIR, OBJECT_DETECTION_FILE)
     else:
         od_df = pd.read_csv(OBJECT_DETECTION_FILE, encoding='utf-8', engine='python')
     # Can drop the confidence scores from the object detection data frame as they are not used
