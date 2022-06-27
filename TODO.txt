@@ -12,20 +12,3 @@ lot cleaner most likely. Basically, do the below:
 
 Convert HOF to use the Python scripts created by Dr. Anderson's group.
     Replace all the MatLab code with Python and update the pipeline.
-        May not need to store CSV/Json files for everything anymore.
-
-
-
------------------------------------------------------------------------------
-Testing now with Python 3.10 and venv
-Need to still test with a conda environment and pip installing the requirements
-
-
-To use the HOFPY script, I'll have to create a mask image for the input to the HOF script.
-I did something similar in matlab, need to do this and then grab all of the hof outputs.
-    After getting the output, need to examine what exactly is in there. Are there NaNs?
-
-
-I think I have the HoFpy incorporated. What I'll need to do is run all of these results off again.
-
-First make sure the FIS is working. Verify the last part of the system.
