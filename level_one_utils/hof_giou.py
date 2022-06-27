@@ -4,46 +4,53 @@ Call the HOF code from Matlab and return the results to the Python script
 
 import numpy as np
 from sklearn.preprocessing import minmax_scale
+import hofpy
 
 
-def compute_hof(engine=None, matlab_args=None):
+def compute_hof(arg_object=None, ref_object=None, num_directions=360):
     """
-    Compute HOF for an object two-tuple and return the max angles for F0, F2, and Hybrid
-    :param engine:
-    :param matlab_args:
+    Compute HOF for an object tuple and return the max angles for F0, F2, and Hybrid
+    :param arg_object: A binary mask image representing the argument object
+    :param ref_object: A binary mask image representing the referrant object
+    :param num_directions: The number of histogram of forces directions to compute (default 360)
+    :return: The maximum F0, F2, and Hybrid HOF angles
+    """
+    assert arg_object is not None, "Must supply argument image"
+    assert ref_object is not None, "Must supply referrant image"
+    f0 = hofpy.F0Hist(arg_object, ref_object, numberDirections=num_directions)
+    f2 = hofpy.F2Hist(arg_object, ref_object, numberDirections=num_directions)
+    hybrid = hofpy.F02Hist(arg_object, ref_object, numberDirections=num_directions)
+
+    f0 = np.nan_to_num(f0)
+    f2 = np.nan_to_num(f2)
+    hybrid = np.nan_to_num(hybrid)
+    max_f0_angle = np.argmax(f0)
+    max_f2_angle = np.argmax(f2)
+    max_hybrid_angle = np.argmax(hybrid)
+    return max_f0_angle, max_f2_angle, max_hybrid_angle
+
+
+def compute_hof_display(arg_object=None, ref_object=None, num_directions=360):
+    """
+    Compute HOF for an object two-tuple and return the histograms for display
+    :param arg_object:
+    :param ref_object:
+    :param num_directions:
     :return:
     """
-    assert engine is not None, 'Must supply Matlab engine'
-    assert matlab_args is not None, 'Must supply Matlab args'
-    histograms = engine.get_hof(matlab_args, nargout=1)
-    histograms = np.array(histograms._data).reshape(histograms.size, order='F')
-    histograms = np.nan_to_num(histograms)
-    max_f0_angle = np.argmax(histograms[0])
-    max_f2_angle = np.argmax(histograms[1])
-    max_hybrid_angle = np.argmax(histograms[2])
-    return [max_f0_angle, max_f2_angle, max_hybrid_angle]
+    assert arg_object is not None, "Must supply the argument mask image"
+    assert ref_object is not None, "Must supply the referrant mask image"
+    f0 = hofpy.F0Hist(arg_object, ref_object, numberDirections=num_directions)
+    f2 = hofpy.F2Hist(arg_object, ref_object, numberDirections=num_directions)
+    hybrid = hofpy.F02Hist(arg_object, ref_object, numberDirections=num_directions)
+    f0 = np.nan_to_num(f0)
+    f2 = np.nan_to_num(f2)
+    hybrid = np.nan_to_num(hybrid)
+    f0_histograms = minmax_scale(f0, feature_range=(0, 100))
+    f2_histograms = minmax_scale(f2, feature_range=(0, 100))
+    hyb_histograms = minmax_scale(hybrid, feature_range=(0, 100))
 
-
-def compute_hof_display(engine=None, matlab_args=None):
-    """
-    Compute HOF for an object two-tuple and return the histograms for displaying
-    :param engine:
-    :param matlab_args:
-    :return:
-    """
-    assert engine is not None, 'Must supply Matlab engine'
-    assert matlab_args is not None, 'Must supply Matlab args'
-    histograms = engine.get_hof(matlab_args, nargout=1)
-    histograms = np.array(histograms._data).reshape(histograms.size, order='F')
-    histograms = np.nan_to_num(histograms)
-    f0_histograms = minmax_scale(histograms[0], feature_range=(0, 100))
-    f2_histograms = minmax_scale(histograms[1], feature_range=(0, 100))
-    hyb_histograms = minmax_scale(histograms[2], feature_range=(0, 100))
-    f0_histograms = f0_histograms.astype(int)
-    f2_histograms = f2_histograms.astype(int)
-    hyb_histograms = hyb_histograms.astype(int)
-
-    return f0_histograms, f2_histograms, hyb_histograms
+    return f0_histograms.astype(int), f2_histograms.astype(int), hyb_histograms.astype(int)
 
 
 def compute_giou(arg_obj, ref_obj):

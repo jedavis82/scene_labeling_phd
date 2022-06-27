@@ -12,17 +12,17 @@ import pandas as pd
 import json
 from tqdm import tqdm
 
-
+# The YOLOv3 configuration model file
 MODEL_FILE = './input/models/yolo/yolov3.cfg'
+# The YOLOv3 weights file to load into the model
 WEIGHTS_FILE = './input/models/yolo/yolov3.weights'
+# The list of labels for the coco data set. These are the classifiable objects when using the YOLOv3 model
 LABELS_FILE = './input/labels/coco.names'
 
-BOX_CONFIDENCE_THRESHOLD = 0.79
-NMS_THRESHOLD = 0.4
-INPUT_WIDTH = 416
+BOX_CONFIDENCE_THRESHOLD = 0.79  # The cutoff for keeping a bounding box
+NMS_THRESHOLD = 0.4  # The cutoff for removing duplicate boxes during non-maxima suppression
+INPUT_WIDTH = 416  # YOLOv3 requires a fixed input width and height to the model
 INPUT_HEIGHT = 416
-
-DRAW_DETECTIONS = False  # If true, will draw detections on an image and visualize
 
 
 def load_label_map():
@@ -53,7 +53,8 @@ def load_image_paths(images_dir=None):
 
 def get_output_names(net):
     layer_names = net.getLayerNames()
-    return [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+    # return [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]  # Old Python 3.7 and older CV2
+    return [layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
 
 
 def draw_detection(img, boxes, labels):
@@ -64,18 +65,21 @@ def draw_detection(img, boxes, labels):
     cv2.waitKey(0)
 
 
-def yolo_object_detection(images_dir=None, output_file=None):
+def batch_yolo_detection(images_dir=None, output_file=None, draw_detections=None):
     assert images_dir is not None, "Must supply input image directory"
-    assert output_file is not None, "Must supply output file path"
+    # assert output_file is not None, "Must supply output file path"
 
+    if draw_detections is None:
+        draw_detections = False
     labels_dict = load_label_map()
     image_names, images = load_image_paths(images_dir)
     # Load the yolo model using opencv
     net = cv2.dnn.readNetFromDarknet(MODEL_FILE, WEIGHTS_FILE)
     net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
-    results_df = pd.DataFrame(columns=['relative_path', 'bounding_boxes', 'num_objects', 'confidences', 'labels',
-                                       'img_width', 'img_height'])
+
+    # Store each images result as a dict and add to the img_results list
+    img_results = []
     for i, n in tqdm(zip(images, image_names), total=len(image_names)):
         # print(f'Processing: {n}')
         blob = cv2.dnn.blobFromImage(i, 1/255, (INPUT_WIDTH, INPUT_HEIGHT), [0, 0, 0], 1, crop=False)
@@ -124,7 +128,8 @@ def yolo_object_detection(images_dir=None, output_file=None):
         indices = cv2.dnn.NMSBoxes(boxes, confidences, BOX_CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
         obj_labels = {}
         for idx in indices:
-            i = idx[0]
+            # i = idx[0]  # Old Python 3.7 and older CV2
+            i = idx
             box = boxes[i]
             conf = confidences[i]
             label = labels_dict[int(class_ids[i])]
@@ -138,15 +143,18 @@ def yolo_object_detection(images_dir=None, output_file=None):
             df_boxes.append(box)
             df_confidences.append(conf)
         num_objects = len(indices)
-        results_df = results_df.append({'relative_path': n, 'bounding_boxes': df_boxes, 'num_objects': num_objects,
-                                        'confidences': df_confidences, 'labels': json.dumps(df_labels),
-                                        'img_width': img_width, 'img_height': img_height}, ignore_index=True)
-        if DRAW_DETECTIONS:
+        img_results.append({'relative_path': n, 'bounding_boxes': json.dumps(df_boxes), 'num_objects': num_objects,
+                            'confidences': df_confidences, 'labels': json.dumps(df_labels),
+                            'img_width': img_width, 'img_height': img_height})
+        if draw_detections:
             img_path = images_dir + n
             clone = cv2.imread(img_path, cv2.IMREAD_COLOR)
             draw_detection(clone, df_boxes, df_labels)
-    # Drop any rows where there are < 2 detections
+    # Drop any rows where there are < 2 detections. These can't be processed by the S2T system
+    results_df = pd.DataFrame(img_results)
     results_df.drop(results_df[results_df['num_objects'] < 2].index, inplace=True)
-    results_df.to_csv(output_file, encoding='utf-8', header=True, index=False)
+    if output_file is not None:
+        # Only write to disk when the output file is specified
+        results_df.to_csv(output_file, encoding='utf-8', header=True, index=False)
     print('Finished writing results to csv file')
     return results_df
