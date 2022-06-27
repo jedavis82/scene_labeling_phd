@@ -132,3 +132,4 @@ dmypy.json
 /input/coco_images/
 input/image_results/
 visualizations/hist_vis/
+/scene_labeling_env/

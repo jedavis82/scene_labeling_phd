@@ -30,7 +30,7 @@ def preprocess_image(img):
     return image
 
 
-def compute_metadata(df, images_dir, output_file):
+def compute_metadata(df, images_dir, output_file=None):
     os.environ['TORCH_HOME'] = TORCH_HOME_DIR
     imagenet_labels = dict(enumerate(open(LABELS_FILE)))
     img_paths = list(df['relative_path'].unique())
@@ -65,5 +65,8 @@ def compute_metadata(df, images_dir, output_file):
         })
 
     results_df = pd.DataFrame(results)
-    results_df.to_csv(output_file, encoding='utf-8', header=True, index=False)
+    if output_file is not None:
+        # Only save to csv if output file is specified
+        results_df.to_csv(output_file, encoding='utf-8', header=True, index=False)
     return results_df
+
